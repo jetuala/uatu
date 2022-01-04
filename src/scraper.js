@@ -7,7 +7,8 @@ export async function scrapeSubreddit() {
         userAgent: 'Captain America',
         clientId: constants.clientId,
         clientSecret: constants.clientSecret,
-        refreshToken: constants.refreshToken
+        refreshToken: constants.refreshToken,
+        accessToken: constants.accessToken
     });
 
     const subreddit = await r.getSubreddit('Marvel');

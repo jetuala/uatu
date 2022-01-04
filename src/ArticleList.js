@@ -1,5 +1,7 @@
 import Article from "./Article";
-import { scrapeSubreddit } from './scraper';
+import constants from './constants';
+
+var snoowrap = require('snoowrap')
 
 const ArticleList = () => {
     // const data = [
@@ -22,13 +24,41 @@ const ArticleList = () => {
     //         score: 500
     //     }
     // ]
-    const data = scrapeSubreddit();
+    async function scrapeSubreddit() {
+        const r = new snoowrap({
+            userAgent: 'Captain America',
+            clientId: constants.clientId,
+            clientSecret: constants.clientSecret,
+            refreshToken: constants.refreshToken,
+            accessToken: constants.accessToken
+        });
+    
+        const subreddit = await r.getSubreddit('Marvel');
+        const topPosts = await subreddit.getTop({time: 'week', limit: 3});
+    
+        let data = [];
+    
+        topPosts.forEach((post) => {
+            data.push({
+                link: post.url,
+                text: post.title,
+                score: post.score
+            })
+        })
 
-    const listItems = data.map((obj) => {
-        return (
-            <Article id={obj.id} title={obj.text} link={obj.link} score={obj.score} />
-        )}
-    )
+        const listItems = data.map((obj) => {
+            return (
+                <Article id={obj.id} title={obj.text} link={obj.link} score={obj.score} />
+            )}
+        )
+    
+        return listItems;
+    }
+
+    const listItems = scrapeSubreddit();
+
+    // Still having the same problem: React is trying to render the component before getting the results back from the Promise.
+
     return (
         <ul>
             {listItems}
